@@ -39,10 +39,3 @@ Ensure your Redis server is running. Modify the Redis connection settings in the
 
 - **CAS Server**: Handles user authentication requests and issues tickets for validated sessions.
 - **App1**: Demonstrates how a client application can use SSO for user authentication. It checks for authentication tickets and validates them with the CAS.
-
-## Contributing
-Contributions to this project are welcome! Please fork the repository and submit a pull request with your features or fixes.
-
-## License
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) file for details.
-
