@@ -1,4 +1,3 @@
-# SSO_demo
 # Single Sign-On (SSO) Demo
 
 ## Overview
