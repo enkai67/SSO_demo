@@ -23,7 +23,8 @@ const redisClient = redis.createClient({
 });
 
 redisClient.on("error", (err) => console.log("Redis Client Error", err));
-redisClient.connect()
+redisClient
+    .connect()
     .then(() => console.log("Connected to Redis server"))
     .catch(console.error);
 
@@ -33,31 +34,33 @@ export default redisClient;
 cas.use(bodyParser.urlencoded({ extended: true }));
 cas.use(cookieParser());
 
-cas.use(session({
-    store: new RedisStore({ client: redisClient }),
-    secret: "CAS",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false,
-        httpOnly: true,
-        maxAge: 3600000 
-    }
-}));
+cas.use(
+    session({
+        store: new RedisStore({ client: redisClient }),
+        secret: "CAS",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            secure: false,
+            httpOnly: true,
+            maxAge: 3600000
+        }
+    })
+);
 
 // user data -> later could move to Redis
 const users = { username: "1", password: "1" };
 
-cas.get("/login", (req, res) => {        
+cas.get("/login", (req, res) => {
     // Check if session cookie exists and is valid
     if (req.session.username) {
-        console.log("req.session: ",req.session);
+        console.log("req.session: ", req.session);
         const ticket = req.session.ticket;
         res.redirect(`/serviceValidate?ticket=${ticket}`);
     } else {
         // If no valid session, show login form
         console.log(req.query);
-        const { service } = req.query; 
+        const { service } = req.query;
 
         const decodedServiceUrl = decodeURIComponent(service);
         console.log("decodedServiceUrl: ", decodedServiceUrl);
@@ -79,7 +82,7 @@ cas.post("/login", async (req, res) => {
         //create ticket
         const ticket = "ST-" + uuid();
 
-        redisUtils.setRedis(ticket, JSON.stringify({ username, service }), 3600000);
+        redisUtils.setRedisValue(ticket, JSON.stringify({ username, service }), 3600000);
 
         const redirectUrl = `${service}?ticket=${ticket}`;
         console.log("/login redirectUrl: ", redirectUrl);
@@ -102,7 +105,7 @@ cas.get("/serviceValidate", async (req, res) => {
     try {
         const { ticket, service } = req.query;
 
-        const ticketDataJson = await redisUtils.getRedis(ticket);
+        const ticketDataJson = await redisUtils.getRedisValue(ticket);
         const ticketData = JSON.parse(ticketDataJson);
 
         console.log("Value retrieved:", ticketData);
@@ -114,7 +117,7 @@ cas.get("/serviceValidate", async (req, res) => {
             const redirectUrl = new URL(service);
             redirectUrl.searchParams.append("ticket", ticket);
 
-            redisUtils.deleteRedis(ticket);
+            redisUtils.deleteRedisValue(ticket);
 
             res.json({
                 serviceResponse: {

@@ -67,12 +67,11 @@ app.get("/", checkAuthentication, (_req, res) => {
 
 app.get("/login", (_req, res) => {
     const redirectUrl = `${CAS_URL}/login?service=${encodeURIComponent(SERVICE_URL)}`;
-    // res.redirect(redirectUrl);
-    console.log("Redirect URL:", redirectUrl); // Check the actual URL
 
+    console.log("Redirect URL:", redirectUrl); // Check the actual URL
     // Send the HTML content as the response
-    res.redirect(redirectUrl);
     // TODO: make an app login page and redirect to CAS login page
+    res.redirect(redirectUrl);
 });
 
 app.get("/validate", async (req, res) => {

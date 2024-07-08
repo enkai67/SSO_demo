@@ -1,14 +1,34 @@
 import redisClient from "../cas.js";
 
-function setRedis(key, value) {
-    redisClient.set(key, value);
+function setRedisValue(key, value) {
+    return new Promise((resolve, reject) => {
+        redisClient.set(key, value, (err, result) => {
+            if (err) {
+                console.error("Error setting key:", err);
+                reject(err);
+            } else {
+                console.log("Set result:", result);
+                resolve(result);
+            }
+        });
+    });
 }
 
-function deleteRedis(key) {
-    redisClient.del(key);
+function deleteRedisValue(key) {
+    return new Promise((resolve, reject) => {
+        redisClient.del(key, (err, result) => {
+            if (err) {
+                console.error("Error deleting key:", err);
+                reject(err);
+            } else {
+                console.log("Delete result:", result);
+                resolve(result);
+            }
+        });
+    });
 }
 
-function getRedis(key) {
+function getRedisValue(key) {
     return new Promise((resolve, reject) => {
         redisClient.get(key, (err, result) => {
             if (err) {
@@ -23,7 +43,7 @@ function getRedis(key) {
 }
 
 export default {
-    setRedis,
-    getRedis,
-    deleteRedis
+    setRedisValue,
+    getRedisValue,
+    deleteRedisValue
 };
